@@ -87,10 +87,10 @@ Elementi naloga za prenos prikazani u QR kodu [PDF Izvor](http://https://www.nbs
 
 ### Opis elemenata:
 - Tag **K**: Identifikacioni kod označava sadržaj QR koda i može imati vrednosti:
- -  **PR** – za QR kod na štampanom računu velikih izdavalaca računa
- -  **PT** – za QR kod na prodajnom mestu, prikazan od strane trgovca
- -  **PK** – za QR kod na prodajnom mestu, prikazan od strane kupca
- -  **EK** – za QR kod u aplikaciji e-commerce;
+  - **PR** – za QR kod na štampanom računu velikih izdavalaca računa
+  - **PT** – za QR kod na prodajnom mestu, prikazan od strane trgovca
+  - **PK** – za QR kod na prodajnom mestu, prikazan od strane kupca
+  - **EK** – za QR kod u aplikaciji e-commerce;
 - Tag **V**: Verzija označava verziju prezentacije QR koda, fiksna vrednost je 01;
 - Tag **C**: Znakovni skup se koristi u prezentaciji, fiksna vrednost 1 označava upotrebu UTF-8 kodnog rasporeda;
 - Tag **R**: Broj računa primaoca plaćanja označava broj tekućeg odnosno drugog platnog računa primaoca plaćanja u skladu s propisima;
