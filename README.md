@@ -1,5 +1,8 @@
 # IPS QR Code Generator
 
+### What is this?
+This is a simple CLI tool to generate IPS QR Codes for easy mobile banking payments. 
+
 ### Install
 
     $ npm i -g ips-qr-code
