@@ -1,4 +1,10 @@
 # IPS QR Code Generator
+![GitHub issues badge](https://img.shields.io/github/issues/ArtBIT/ips-qr-code)
+![GitHub forks badge](https://img.shields.io/github/forks/ArtBIT/ips-qr-code)
+![GitHub stars badge](https://img.shields.io/github/stars/ArtBIT/ips-qr-code)
+![GitHub license badge](https://img.shields.io/github/license/ArtBIT/ips-qr-code)
+![Twitter badge](https://img.shields.io/twitter/url?url=https%3A%2F%2Fgithub.com%2FArtBIT%2Fips-qr-code)
+
 
 ### Šta je ovo?
 ips-qr-code je jednostavna CLI aplikacija za generisanje IPS QR kodova. [NBS IPS](https://www.nbs.rs/internet/latinica/35/QR_kod.html)
