@@ -19,7 +19,7 @@ Data URI:
 Slika:
 
     $ ips-qr-code --naziv-platioca "@artbit" --racun-platioca "123456789012345678" --naziv-primaoca "GitHub Ltd," --racun-primaoca "123456789012345678" --sifra-placanja "221" --iznos "RSD1," --svrha-placanja "Example usage" --to-file example.png
-    ![Primer IPS QR koda](/example.png)
+![Primer IPS QR koda](/example.png)
 
 ### Opcije
 ##### -k, --kod  [string=PR]
