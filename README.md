@@ -1,19 +1,19 @@
 # IPS QR Code Generator
 
-### What is this?
-This is a simple CLI tool to generate IPS QR Codes for easy mobile banking payments. 
+### Šta je ovo?
+ips-qr-code je jednostavna CLI aplikacija za generisanje IPS QR kodova. [NBS IPS](https://www.nbs.rs/internet/latinica/35/QR_kod.html)
 
-### Install
+### Instalacija
 
     $ npm i -g ips-qr-code
 
-### Example Usage
+### Primer korišćenja
 
     $ ips-qr-code --naziv-platioca "@artbit" --racun-platioca "123456789012345678" --naziv-primaoca "GitHub Ltd," --racun-primaoca "123456789012345678" --sifra-placanja "221" --iznos "RSD1," --svrha-placanja "Example usage" --to-datauri
     $ data:image/png;base64,iVBORw0KGg...SUVORK5CYII=
 
 
-### Options
+### Opcije
 ##### -k, --kod  [string=PR]
 Identifikacioni kod koji opisuje sadržaj QR koda.
 Moguće vrednosti su:
@@ -115,5 +115,5 @@ Svako polje navodi se kao par definisanog taga i sadržaja tog polja. Polja se r
 delimiterom – uspravnom crtom (|). Poslednje polje u sadržaju predstavlja kraj zapisa.
 Delimiter ne sme biti deo sadržaja polja. Ako ne sadrže vrednost, tagovi opcionih polja se ne navode u QR kodu.
 
-# License
+# Licenca
 MIT
