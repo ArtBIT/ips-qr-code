@@ -1,4 +1,5 @@
 # IPS QR Code Generator
+![Travis CI](https://img.shields.io/travis/artbit/ips-qr-code/master)
 ![GitHub issues badge](https://img.shields.io/github/issues/ArtBIT/ips-qr-code)
 ![GitHub forks badge](https://img.shields.io/github/forks/ArtBIT/ips-qr-code)
 ![GitHub stars badge](https://img.shields.io/github/stars/ArtBIT/ips-qr-code)
