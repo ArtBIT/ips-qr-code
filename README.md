@@ -27,12 +27,11 @@ ips-qr-code je jednostavna CLI aplikacija za generisanje IPS QR kodova. [NBS IPS
 
     $ ips-qr-code --naziv-platioca "@artbit" --racun-platioca "123456789012345678" --naziv-primaoca "GitHub Ltd," --racun-primaoca "123456789012345678" --sifra-placanja "221" --iznos "RSD1," --svrha-placanja "Example usage" --to-file example.png
 ![Primer IPS QR koda](/images/example.png)
-Slika:
 
 #### Terminal:
 
     $ ips-qr-code --naziv-platioca "@artbit" --racun-platioca "123456789012345678" --naziv-primaoca "GitHub Ltd," --racun-primaoca "123456789012345678" --sifra-placanja "221" --iznos "RSD1," --svrha-placanja "Example usage" --to-text
-![Primer IPS QR koda](/images/example.terminal.png | width=180)
+<img src="/images/example.terminal.png" width="180" height="200" alt="Primer IPS QR koda" />
 
 ### Opcije
 ##### -k, --kod  [string=PR]
