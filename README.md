@@ -32,7 +32,7 @@ Slika:
 #### Terminal:
 
     $ ips-qr-code --naziv-platioca "@artbit" --racun-platioca "123456789012345678" --naziv-primaoca "GitHub Ltd," --racun-primaoca "123456789012345678" --sifra-placanja "221" --iznos "RSD1," --svrha-placanja "Example usage" --to-text
-![Primer IPS QR koda](/images/example.terminal.png)
+![Primer IPS QR koda](/images/example.terminal.png | width=180)
 
 ### Opcije
 ##### -k, --kod  [string=PR]
