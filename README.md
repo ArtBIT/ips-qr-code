@@ -9,6 +9,8 @@ ips-qr-code je jednostavna CLI aplikacija za generisanje IPS QR kodova. [NBS IPS
 
 ### Primer korišćenja
 
+Note: Broj bankovnog racuna iz primera je nepostojeci
+
 Data URI:
 
     $ ips-qr-code --naziv-platioca "@artbit" --racun-platioca "123456789012345678" --naziv-primaoca "GitHub Ltd," --racun-primaoca "123456789012345678" --sifra-placanja "221" --iznos "RSD1," --svrha-placanja "Example usage" --to-datauri
