@@ -132,7 +132,12 @@ Output terminal friendly QR code
 
 
 ## IPS QR Code Format
-Elementi naloga za prenos prikazani u QR kodu [PDF Izvor](http://https://www.nbs.rs/internet/latinica/15/mediji/vesti/20180507_preporuke_QRkod.pdf "PDF Izvor")
+Elementi naloga za prenos prikazani u QR kodu [PDF Izvor](https://www.nbs.rs/internet/latinica/20/plp/odluka_transfer_2018_prilog.pdf "PDF Izvor")
+
+Stari linkovi koji su prestali da važe:
+~~http://https://www.nbs.rs/internet/latinica/15/mediji/vesti/20180507_preporuke_QRkod.pdf~~
+
+
 
 ### Opis elemenata:
 - Tag **K**: Identifikacioni kod označava sadržaj QR koda i može imati vrednosti:
