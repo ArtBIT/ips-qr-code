@@ -33,6 +33,31 @@ ips-qr-code je jednostavna CLI aplikacija za generisanje IPS QR kodova. [NBS IPS
     $ ips-qr-code --naziv-platioca "@artbit" --racun-platioca "123456789012345678" --naziv-primaoca "GitHub Ltd," --racun-primaoca "123456789012345678" --sifra-placanja "221" --iznos "RSD1," --svrha-placanja "Example usage" --to-text
 <img src="/images/example.terminal.png" width="180" height="200" alt="Primer IPS QR koda" />
 
+#### Kao biblioteka
+
+ips-qr-code je napisana kao CLI aplikacija, ali može da se koristi i kao biblioteka, sa doduše malo kriptičnim API-jem jer koristi skraćene oblike opcija u obliku u kom su i same upisane u IPS QR kod.
+
+```js
+const generator = require("ips-qr-code");
+const qrcode = require("qrcode");
+const filename = "test.png";
+
+generator({
+    p: "Marko Markovic",
+    s: "Uplata po racunu",
+    n: "EPS Snabdevanje 11000 Beograd",
+    sf: "221",
+    i: "RSD1000,00",
+    o: "123456789012345611",
+    r: "845000000014284968",
+    k: "PR",
+    v: "01",
+    c: 1,
+})
+.then(ipsString => qrcode.toFile(filename, ipsString))
+.catch(error => console.error(error));
+```
+
 ### Opcije
 ##### -k, --kod  [string=PR]
 Identifikacioni kod koji opisuje sadržaj QR koda.
