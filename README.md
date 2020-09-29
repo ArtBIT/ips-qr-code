@@ -8,7 +8,7 @@
 
 
 ### Šta je ovo?
-ips-qr-code je jednostavna CLI aplikacija za generisanje IPS QR kodova. [NBS IPS](https://www.nbs.rs/internet/latinica/35/QR_kod.html)
+ips-qr-code je jednostavna CLI aplikacija za generisanje IPS QR kodova. [NBS IPS](https://web.archive.org/web/20200929100311/https://www.nbs.rs/sr/ciljevi-i-funkcije/platni-sistem/nbs-operator/ips-nbs/index.html)
 
 ### Instalacija
 
