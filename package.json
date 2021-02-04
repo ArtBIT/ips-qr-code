@@ -17,6 +17,7 @@
   "author": "Djordje Ungar",
   "license": "MIT",
   "dependencies": {
+    "cdigit": "^2.6.0",
     "qrcode": "^1.4.4",
     "yargs": "^15.3.1",
     "yup": "^0.28.5"
