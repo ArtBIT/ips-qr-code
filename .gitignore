@@ -2,6 +2,11 @@
 # Created by https://www.gitignore.io/api/node
 # Edit at https://www.gitignore.io/?templates=node
 
+# Project files
+primer.js
+test.png
+example.terminal.png
+
 ### Node ###
 # Logs
 logs
