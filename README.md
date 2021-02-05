@@ -16,7 +16,39 @@ ips-qr-code je jednostavna CLI aplikacija za generisanje IPS QR kodova. [NBS IPS
 
 ### Primer korišćenja
 
-> Note: Broj bankovnog racuna iz primera je nepostojeci
+Note: Broj bankovnog racuna iz primera je nepostojeci.
+
+Ukoliko zelite da generisete broj bankovnog racuna za testiranje, mozete to uraditi na sledeći način.
+
+Bankovni racun prati sledeći format: BBBRRRRRRRRRRRRRKK
+ - BBB - fiksni broj banke (3 cifre)
+ - RRRRRRRRRRRRR - broj racuna (13 cifara)
+ - KK - kontrolni broj (2 cifre) 
+
+Kontrolni broj se može izračunati po međunarodnom standardu [ISO 7064, МОО111- 97](https://sr.wikipedia.org/wiki/Struktura_broja_teku%C4%87eg_ra%C4%8Duna)
+
+    const izracunajKontrolniBroj = input => {
+        let ostatak = 100;
+        let kontrolniBroj = 0;
+        [...String(input)]
+            .reverse()
+            .map(br => parseInt(br))
+            .filter(br => br)
+            .forEach(br => {
+                kontrolniBroj = (kontrolniBroj + (ostatak * br)) % 97;
+                ostatak = (ostatak * 10) % 97;
+            });
+        return 98 - kontrolniBroj;
+    }
+
+    const generisiBankovniRacun = (brojBanke, brojRacuna) => {
+        const brojRacunaBanke = `${brojBanke}-${brojRacuna}`;
+        return `${brojRacunaBanke}-${izracunajKontrolniBroj(brojRacunaBanke)}`;
+    }
+    
+    console.log(generisiBankovniRacun(123, 456789));
+    // 123-456789-78
+
 
 #### Data URI:
 
