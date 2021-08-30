@@ -97,7 +97,7 @@ generator({
 
 ### Opcije
 
-Detaljni prikaz svih opcija možete pogledati na [wiki stranici](https://github.com/ArtBIT/ips-qr-code/wiki/Opcije).
+Detaljni prikaz svih opcija možete pogledati na [wiki stranici](https://github.com/ArtBIT/ips-qr-code/wiki/Detaljan-prikaz-parametara).
 
 
 # IPS QR Code Format
