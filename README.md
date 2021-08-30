@@ -97,12 +97,12 @@ generator({
 
 ### Opcije
 
-Detaljni prikaz svih opcija možete pogledati na [wiki stranici](https://github.com/ArtBIT/ips-qr-code/wiki/IPS-QR-Code-Format).
+Detaljni prikaz svih opcija možete pogledati na [wiki stranici](https://github.com/ArtBIT/ips-qr-code/wiki/Opcije).
 
 
 # IPS QR Code Format
 
-Detaljni prikaz IPS QR Code formata možete pogledati na [wiki stranici](https://github.com/ArtBIT/ips-qr-code/wiki/Opcije).
+Detaljni prikaz IPS QR Code formata možete pogledati na [wiki stranici](https://github.com/ArtBIT/ips-qr-code/wiki/IPS-QR-Code-Format).
 
 # Licenca
 MIT
