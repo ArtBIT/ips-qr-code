@@ -1,0 +1,6 @@
+/**
+ * cdigit
+ *
+ * @copyright 2018-2020 LiosK
+ * @license Apache-2.0
+ */

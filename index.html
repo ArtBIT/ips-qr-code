@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Browser usage:</title>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <script src="https://www.unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>
+  </head>
+  <body>
+      <main class="container">
+          <form id="generator">
+              <label for="k">Kod</label>
+              <select id="k" name="k">
+                  <option value="PR" selected>PR – za QR kod na štampanom računu velikih izdavalaca računa</option>
+                  <option value="PT">PT – za QR kod na prodajnom mestu, prikazan od strane trgovca</option>
+                  <option value="PK">PK – za QR kod na prodajnom mestu, prikazan od strane kupca</option>
+                  <option value="EK">EK – za QR kod u aplikaciji e-commerce</option>
+              </select>
+
+
+              <input type="hidden" name="v" value="01" />
+              <input type="hidden" name="c" value="1" />
+
+              <label for="r">Račun primaoca</label>
+              <input type="text" id="r" name="r" placeholder="123000000000000012" pattern="[0-9]{18}" required />
+              <small>Broj računa primaoca plaćanja označava broj tekućeg odnosno drugog platnog računa primaoca plaćanja u skladu s propisima. Mora da sadrži tačno 18 cifara, bez povlaka.</small>
+
+              <label for="n">Naziv primaoca</label>
+              <input type="text" id="n" name="n" required />
+              <small>Naziv i sedište primaoca plaćanja označava poslovno ime ili skraćeno poslovno ime primaoca plaćanja, odnosno naziv pod kojim je evidentiran u registru nadležnog organa. Ako naziv primaoca plaćanja sadrži i njegovo sedište, onda nije potrebno navoditi to sedište</small>
+
+              <label for="i">Iznos</label>
+              <input type="text" id="i" name="i" pattern="[A-Z]{3}[0-9]+,[0-9]{2}" placeholder="RSD9999,99" required />
+              <small>Valuta i iznos novčanih sredstava predstavlja oznaku RSD i iznos, u kome se obavezno upisuje decimalna zapeta, iza koje se ne moraju pisati nevažeće decimalne nule primer: RSD1025). Minimalni iznos naloga je RSD0,01, a maksimalni iznos naloga je RSD99999999999999,99. Pri unosu iznosa, hiljade se ne odvajaju tačkama. Nije dozvoljeno  cifru za celo mesto u iznosu. Na primer: RSD,01 nije ispravan iznos, ispravno je RSD0,01;</small>
+
+              <label for="o">Račun platioca</label>
+              <input type="text" id="o" name="o" placeholder="123000000000000012" pattern="[0-9]{18}" required />
+              <small>Broj računa platioca označava broj tekućeg odnosno drugog platnog računa platioca u skladu s propisima. Mora da sadrži tačno 18 cifara, bez povlaka.</small>
+
+              <label for="p">Naziv platioca</label>
+              <input type="text" id="p" name="p" />
+              <small>Naziv i sedište platioca predstavlja ime i prezime i adresu platioca (ulica, broj i mesto)</small>
+
+              <label for="n">Naziv primaoca</label>
+              <input type="text" id="n" name="n" required />
+              <small>Naziv i sedište primaoca plaćanja označava poslovno ime ili skraćeno poslovno ime primaoca plaćanja, odnosno naziv pod kojim je evidentiran u registru nadležnog organa. Ako naziv primaoca plaćanja sadrži i njegovo sedište, onda nije potrebno navoditi to sedište</small>
+
+              <label for="sf">Šifra Plaćanja</label>
+              <input type="text" id="sf" name="sf" pattern="[1239][0-9]{2}" placeholder="121" />
+              <small>Šifra plaćanja označava numerički podatak od tri cifre, od kojih prva identifikuje način plaćanja, a druge dve osnovu</small>
+
+              <label for="s">Svrha Plaćanja</label>
+              <input type="text" id="s" name="s" />
+              <small>Svrha plaćanja označava podatke o nameni i osnovu prenosa, odnosno uplate novčanih sredstava</small>
+
+              <label for="m">Merchant Code Category</label>
+              <input type="text" id="m" name="m" />
+              <small>MCC je oznaka Merchant Code Category – kod kategorije trgovca u skladu sa ISO 18245. Spisak dozvoljenih kodova biće utvrđen tehničkom dokumentacijom sistema IPS NBS</small>
+
+              <label for="jf">Jednokratna Šifra</label>
+              <input type="text" id="jf" name="jf" />
+              <small>Jednokratna šifra platioca predstavlja TOTR vrednost (jednokratnu šifru čije je važenje vremenski ograničeno, npr. pet minuta).Banka platioca stvara jednokratnu šifru, ali i izvršava autorizaciju transakcije plaćanja</small>
+
+              <label for="ro">Poziv Na Broj</label>
+              <input type="text" id="ro" name="ro" />
+              <small>Poziv na broj odobrenja primaoca plaćanja označava dopunske podatke za primaoca plaćanja u skladu s propisima</small>
+
+              <label for="rl">Referenca Primaoca</label>
+              <input type="text" id="rl" name="rl" />
+              <small>Referenca primaoca plaćanja označava dopunske podatke za primaoca plaćanja u slobodnoj formi</small>
+
+              <label for="rp">Referenca Plaćanja</label>
+              <input type="text" id="rp" name="rp" />
+              <small>Referenca koja identifikuje transakciju na prodajnom mestu predstavlja jedinstveni identifikator samog plaćanja, ukupne dužine 19</small>
+
+              <label for="margin">Margina QR Koda</label>
+              <input type="range" id="margin" name="margin" min="0" max="100" value="10">
+
+              <label for="fg">Boja QR Koda</label>
+              <input type="color" id="fg" name="fg" value="#000000">
+
+              <label for="bg">Boja Pozadine QR Koda</label>
+              <input type="color" id="bg" name="bg" value="#ffffff">
+
+              <label for="scale">Veličina QR Kod piksela</label>
+              <input type="range" id="scale" name="scale" min="1" max="10" value="4">
+
+              <label for="width">Širina QR Koda</label>
+              <input type="number" id="width" name="width" />
+
+              <label for="height">Visina QR Koda</label>
+              <input type="number" id="height" name="height" />
+
+              <input type="submit" value="Generiši QR Kod" />
+              <canvas id="output"></canvas>
+          </form>
+      </main>
+    <script src="./dist/main.js"></script>
+    <script>
+        var output = document.getElementById('output');
+        document.getElementById('generator').addEventListener('submit', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            var formData = new FormData(e.target);
+            var data = {};
+            formData.forEach((value, key) => {
+                if (value !== "") data[key] = value;
+            });
+            var { width, height, margin, scale, fg:dark, bg:light, ...qrCodeParams } = data;
+            var options = { width, height, margin, scale, color: { light, dark } };
+            IpsQrCode(qrCodeParams)
+                .then(ipsString => QRCode.toCanvas(output, ipsString, options))
+                .catch(error => console.error(error));
+            return false;
+        });
+    </script>
+  </body>
+</html>
