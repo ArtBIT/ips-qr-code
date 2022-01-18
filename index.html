@@ -108,7 +108,10 @@
             var { width, height, margin, scale, fg:dark, bg:light, ...qrCodeParams } = data;
             var options = { width, height, margin, color: { light, dark } };
             IpsQrCode(qrCodeParams)
-                .then(ipsString => QRCode.toCanvas(output, ipsString, options))
+                .then(ipsString => {
+                    console.log(`Sadržaj QR koda je: '${ipsString}'`);
+                    QRCode.toCanvas(output, ipsString, options);
+                })
                 .catch(error => console.error(error));
             return false;
         });
