@@ -74,13 +74,29 @@ Probajte web demo [ovde](https://artbit.github.io/ips-qr-code/)
 
 #### Kao biblioteka
 
-ips-qr-code je napisana kao CLI aplikacija, ali može da se koristi i kao biblioteka, sa doduše malo kriptičnim API-jem jer koristi skraćene oblike opcija u obliku u kom su i same upisane u IPS QR kod.
+ips-qr-code je napisana kao CLI aplikacija, ali može da se koristi i kao biblioteka:
 
 ```js
 const generator = require("ips-qr-code");
 const qrcode = require("qrcode");
 const filename = "test.png";
 
+generator({
+    nazivPlatioca: "Marko Markovic",
+    svrhaPlacanja: "Uplata po racunu",
+    nazivPrimaoca: "EPS Snabdevanje 11000 Beograd",
+    sifraPlacanja: "221",
+    iznos: "RSD1000,00",
+    racunPrimaoca: "845000000014284968",
+    kod: "PR",
+    verzija: "01",
+    kod: 1,
+})
+.then(ipsString => qrcode.toFile(filename, ipsString))
+.catch(error => console.error(error));
+
+// sto je ekvivalentno sledecem, malo kriptičnijem API-ju, jer koristi
+// skraćene oblike opcija u obliku u kom su i same upisane u IPS QR kod:
 generator({
     p: "Marko Markovic",
     s: "Uplata po racunu",
