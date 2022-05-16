@@ -90,7 +90,7 @@ generator({
     racunPrimaoca: "845000000014284968",
     kod: "PR",
     verzija: "01",
-    kod: 1,
+    znakovniSkup: 1,
 })
 .then(ipsString => qrcode.toFile(filename, ipsString))
 .catch(error => console.error(error));
