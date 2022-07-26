@@ -4,6 +4,10 @@
   "description": "Generator za IPS QR kodove (Instant plaćanje)",
   "main": "./lib/index.js",
   "bin": "./bin/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArtBIT/ips-qr-code"
+  },
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "test": "jest"
