@@ -1,6 +1,6 @@
 {
   "name": "ips-qr-code",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Generator za IPS QR kodove (Instant plaćanje)",
   "main": "./lib/index.js",
   "bin": "./bin/index.js",
@@ -12,13 +12,7 @@
     "build": "webpack --config webpack.config.js",
     "test": "jest"
   },
-  "keywords": [
-    "ips",
-    "qrcode",
-    "generator",
-    "uplatnica",
-    "placanje"
-  ],
+  "keywords": ["ips", "qrcode", "generator", "uplatnica", "placanje"],
   "author": "Djordje Ungar",
   "license": "MIT",
   "dependencies": {
