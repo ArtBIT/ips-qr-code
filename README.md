@@ -11,6 +11,7 @@
 ips-qr-code je jednostavna CLI aplikacija za generisanje IPS QR kodova. [NBS IPS](https://web.archive.org/web/20200929100311/https://www.nbs.rs/sr/ciljevi-i-funkcije/platni-sistem/nbs-operator/ips-nbs/index.html)
 
 ---
+[![Demo](https://raw.githubusercontent.com/ArtBIT/ips-qr-code/images/demo.png)](https://artbit.github.io/ips-qr-code/)
 
 ### Instalacija
 
@@ -25,10 +26,6 @@ ips-qr-code je jednostavna CLI aplikacija za generisanje IPS QR kodova. [NBS IPS
 ---
 
 ### Primeri korišćenja
-
-#### Web DEMO
-
-Probajte web demo [ovde](https://artbit.github.io/ips-qr-code/)
 
 #### Generiši QR kod kao sliku:
 
