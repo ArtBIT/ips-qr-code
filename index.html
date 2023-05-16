@@ -7,23 +7,67 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
     <script src="https://www.unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>
 <style>
+    :root {
+        --spacing: 1.5rem;
+        --form-element-spacing-vertical: 0.5rem;
+        --form-element-spacing-horizontal: 0.5rem;
+    }
+    h2 {
+        text-align: center;
+    }
     main {
         margin: 20px;
+    }
+    .box {
+        margin-bottom: var(--spacing);
+    }
+    .errors {
+      color: var(--form-element-invalid-border-color);
     }
     .hidden {
         display: none;
     }
     .column {
-        margin: 10px;
+        margin: 24px;
+    }
+    .sticky {
+        margin: 0;
+        position: sticky;
+        top: 20px;
+        padding: var(--spacing);
     }
     pre {
-        padding: 10px;
+        padding: 24px;
+    }
+    canvas#outeput {
+        object-fit: contain;
+        max-width: 100%;
+        height: auto;
+    }
+    .backdrop {
+        position: absolute;
+        z-index: -1;
+    }
+    .backdrop canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    .backdrop .gradient {
+        width: 100%;
+        height: 100px;
+        position: absolute;
+        bottom: 0;
+        background: linear-gradient(rgba(0,0,0,0) 0%, #11191f 80%);
     }
 </style>
 
   </head>
   <body>
      <a href="https://github.com/ArtBIT/ips-qr-code" style="position: absolute; top: 0; right: 0; border: 0;"><img decoding="async" loading="lazy" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_white_ffffff.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
+     <div class="backdrop">
+       <canvas id="backdrop"></canvas>
+       <div class="gradient"></div>
+     </div>
     <main>
       <div class="container-fluid">
           <form id="generator">
@@ -135,15 +179,19 @@
                 </div>
 
                 <div class="column">
-                 <input type="submit" value="Generiši QR Kod" role="button" class="outline" />
-                  <div id="errors" class="errors"></div>
-                  <div id="result">
-                  <div>
-                    <span><strong>Sadržaj IPS QR Koda</strong></span>
-                    <pre id="code"></pre>
-                  </div>
-                  <canvas id="output"></canvas>
-                  </div>
+                  <article class="sticky">
+                    <input type="submit" value="Generiši QR Kod" role="button" class="outline" />
+                    <ul id="errors" class="errors"></ul>
+                    <div id="result">
+                        <div class="box">
+                            <canvas id="output"></canvas>
+                        </div>
+                        <div class="box">
+                            <span><strong>Sadržaj IPS QR Koda</strong></span>
+                            <pre id="code"></pre>
+                        </div>
+                    </div>
+                    </article>
                 </div>
             </div>
           </form>
@@ -151,12 +199,15 @@
     </main>
     <script src="./dist/main.js"></script>
     <script>
+        const errors = document.getElementById('errors');
         const form = document.getElementById('generator');
         const result = document.getElementById('result');
         result.classList.add('hidden');
+        errors.classList.add('hidden');
 
         const setError = (message, path) => {
-            errors.innerHTML += `<p>${message}</p>`;
+            errors.classList.remove('hidden');
+            errors.innerHTML += `<li>${message}</li>`;
             const elem = document.querySelector(`[name="${path}"]`);
             if (elem) {
                 elem.setAttribute("aria-invalid", true);
@@ -178,9 +229,9 @@
 
             // Hide the result
             result.classList.add('hidden');
+            errors.classList.add('hidden');
             
             // Clear errors
-            const errors = document.getElementById('errors');
             errors.innerHTML = '';
             document.querySelectorAll(`form [name]`).forEach(elem => {
                 elem.removeAttribute("aria-invalid");
@@ -220,6 +271,30 @@
             })
         );
         document.getElementById('generator').addEventListener('submit', resubmit);
+    </script>
+    <script>
+    const bgColor = "#11191f";
+    const fgColor = "rgb(115, 130, 140)";
+    const pixelSize = 20;
+    
+    function init(canvas) {
+      const screenWidth = window.innerWidth;
+      const screenHeight = 200;
+      canvas.width = Math.ceil(screenWidth/pixelSize);
+      canvas.height = Math.ceil(screenHeight/pixelSize);
+      canvas.style.width = `${screenWidth}px`;
+      canvas.style.height = `${screenHeight}px`;
+
+      const ctx = canvas.getContext("2d");
+      for (let x = 0; x < canvas.width; x++) {
+        for (let y = 0; y < canvas.height; y++) {
+          ctx.fillStyle = Math.random() > 0.5 ? fgColor : bgColor;
+          ctx.fillRect(x, y, 1, 1);
+        }
+      }
+    }
+    init(document.getElementById("backdrop"));
+    window.addEventListener("resize", () => init(document.getElementById("backdrop")));
     </script>
   </body>
 </html>
