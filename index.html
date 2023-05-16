@@ -29,7 +29,7 @@
               <small>Naziv i sedište primaoca plaćanja označava poslovno ime ili skraćeno poslovno ime primaoca plaćanja, odnosno naziv pod kojim je evidentiran u registru nadležnog organa. Ako naziv primaoca plaćanja sadrži i njegovo sedište, onda nije potrebno navoditi to sedište</small>
 
               <label for="r">Račun primaoca *</label>
-              <input type="text" id="r" name="r" placeholder="123000000000000012" pattern="[0-9]{18}" required />
+              <input type="text" id="r" name="r" placeholder="123000000000000012" pattern="[0-9]{3}[0-9]{3-13}[0-9]{2}" required />
               <small>Broj računa primaoca plaćanja označava broj tekućeg odnosno drugog platnog računa primaoca plaćanja u skladu s propisima. Mora da sadrži tačno 18 cifara, bez povlaka.</small>
 
               <label for="i">Iznos *</label>
@@ -45,7 +45,7 @@
               <small>Svrha plaćanja označava podatke o nameni i osnovu prenosa, odnosno uplate novčanih sredstava</small>
 
               <label for="ro">Poziv Na Broj</label>
-              <input type="text" id="ro" name="ro" />
+              <input type="text" id="ro" name="ro" pattern="(97|22|11)[0-9- ]+"/>
               <small>Poziv na broj odobrenja primaoca plaćanja označava dopunske podatke za primaoca plaćanja u skladu s propisima</small>
 
               <label for="rl">Referenca Primaoca</label>
@@ -61,7 +61,7 @@
               <small>Naziv i sedište platioca predstavlja ime i prezime i adresu platioca (ulica, broj i mesto)</small>
 
               <label for="o">Račun platioca</label>
-              <input type="text" id="o" name="o" placeholder="123000000000000012" pattern="[0-9]{18}" />
+              <input type="text" id="o" name="o" placeholder="123000000000000012" pattern="[0-9]{3}[0-9]{3-13}[0-9]{2}" />
               <small>Broj računa platioca označava broj tekućeg odnosno drugog platnog računa platioca u skladu s propisima. Mora da sadrži tačno 18 cifara, bez povlaka.</small>
 
 
