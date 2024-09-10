@@ -21,7 +21,7 @@
     "yup": "^0.28.5"
   },
   "devDependencies": {
-    "jest": "^26.6.3",
+    "jest": "^29.7.0",
     "webpack": "^5.60.0",
     "webpack-cli": "^4.9.1"
   }
