@@ -1,301 +1,1232 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>IPS QRCode Generator</title>
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
-    <script src="https://www.unpkg.com/qrcode@1.4.4/build/qrcode.min.js"></script>
-<style>
+<html lang="sr-Latn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>IPS QR generator</title>
+  <meta name="description" content="Besplatan generator IPS QR kodova za instant plaćanja u Srbiji. Podaci ne napuštaju vaš pregledač." />
+  <meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Cpath fill='%230a66c2' d='M0 0h3v3H0zM4 0h3v3H4zM0 4h3v3H0zM4 4h1v1H4zM6 4h1v1H6zM5 5h1v1H5zM4 6h1v1H4zM6 6h1v1H6z'/%3E%3C/svg%3E" />
+  <script src="./dist/qrcode.js"></script>
+  <script src="./dist/main.js"></script>
+  <style>
     :root {
-        --spacing: 1.5rem;
-        --form-element-spacing-vertical: 0.5rem;
-        --form-element-spacing-horizontal: 0.5rem;
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-2: #f1f3f6;
+      --border: #dde1e7;
+      --border-strong: #c3c9d2;
+      --text: #151a21;
+      --text-muted: #5b6573;
+      --accent: #0a66c2;
+      --accent-hover: #0857a6;
+      --accent-soft: #e6f0fa;
+      --on-accent: #ffffff;
+      --ok: #1a7f4b;
+      --ok-soft: #e5f4ec;
+      --err: #c4291c;
+      --err-soft: #fcebe9;
+      --warn: #8a5a00;
+      --focus: 0 0 0 3px rgba(10, 102, 194, 0.35);
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 8px 24px rgba(16, 24, 40, 0.06);
+      --pixel-a: #dfe4ea;
+      --pixel-b: #eceff3;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
     }
-    h2 {
-        text-align: center;
-    }
-    main {
-        margin: 20px;
-    }
-    .box {
-        margin-bottom: var(--spacing);
-    }
-    .errors {
-      color: var(--form-element-invalid-border-color);
-    }
-    .hidden {
-        display: none;
-    }
-    .column {
-        margin: 24px;
-    }
-    .sticky {
-        margin: 0;
-        position: sticky;
-        top: 20px;
-        padding: var(--spacing);
-    }
-    pre {
-        padding: 24px;
-    }
-    canvas#outeput {
-        object-fit: contain;
-        max-width: 100%;
-        height: auto;
-    }
-    .backdrop {
-        position: absolute;
-        z-index: -1;
-    }
-    .backdrop canvas {
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-    }
-    .backdrop .gradient {
-        width: 100%;
-        height: 100px;
-        position: absolute;
-        bottom: 0;
-        background: linear-gradient(rgba(0,0,0,0) 0%, #11191f 80%);
-    }
-</style>
-
-  </head>
-  <body>
-     <a href="https://github.com/ArtBIT/ips-qr-code" style="position: absolute; top: 0; right: 0; border: 0;"><img decoding="async" loading="lazy" width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_white_ffffff.png?resize=149%2C149" class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
-     <div class="backdrop">
-       <canvas id="backdrop"></canvas>
-       <div class="gradient"></div>
-     </div>
-    <main>
-      <div class="container-fluid">
-          <form id="generator">
-            <h2>IPS QR Code generator</h2>
-            <div class="grid">
-                <div class="column">
-                    <details open>
-                        <summary>Podaci o primaocu</summary>
-                        <p>
-                          <label for="n">Naziv primaoca *</label>
-                          <input type="text" id="n" name="n" required />
-                          <small>Naziv i sedište primaoca plaćanja označava poslovno ime ili skraćeno poslovno ime primaoca plaćanja, odnosno naziv pod kojim je evidentiran u registru nadležnog organa. Ako naziv primaoca plaćanja sadrži i njegovo sedište, onda nije potrebno navoditi to sedište</small>
-
-                          <label for="r">Račun primaoca *</label>
-                          <input type="text" id="r" name="r" placeholder="123000000000000012" pattern="[0-9]{3}-?[0-9]{3,13}-?[0-9]{2}" required />
-                          <small>Broj računa primaoca plaćanja označava broj tekućeg odnosno drugog platnog računa primaoca plaćanja u skladu s propisima. Mora da sadrži maksimalno 18 cifara, ne računajući povlake.</small>
-
-                          <label for="rl">Referenca Primaoca</label>
-                          <input type="text" id="rl" name="rl" />
-                          <small>Referenca primaoca plaćanja označava dopunske podatke za primaoca plaćanja u slobodnoj formi</small>
-
-                          <label for="ro">Poziv Na Broj</label>
-                          <input type="text" id="ro" name="ro" pattern="(97|22|11)?[0-9- ]+"/>
-                          <small>Poziv na broj odobrenja primaoca plaćanja označava dopunske podatke za primaoca plaćanja u skladu s propisima</small>
-                        </p>
-                    </details>
-
-                    <details open>
-                        <summary>Podaci o platiocu</summary>
-                        <p>
-                          <label for="p">Naziv platioca</label>
-                          <input type="text" id="p" name="p" />
-                          <small>Naziv i sedište platioca predstavlja ime i prezime i adresu platioca (ulica, broj i mesto)</small>
-
-                          <label for="o">Račun platioca</label>
-                          <input type="text" id="o" name="o" placeholder="123000000000000012" pattern="[0-9]{3}-?[0-9]{3,13}-?[0-9]{2}" />
-                          <small>Broj računa platioca označava broj tekućeg odnosno drugog platnog računa primaoca plaćanja u skladu s propisima. Mora da sadrži maksimalno 18 cifara, ne računajući povlake.</small>
-
-
-                          <label for="m">Merchant Code Category</label>
-                          <input type="text" id="m" name="m" />
-                          <small>MCC je oznaka Merchant Code Category – kod kategorije trgovca u skladu sa ISO 18245. Spisak dozvoljenih kodova biće utvrđen tehničkom dokumentacijom sistema IPS NBS</small>
-                        </p>
-                    </details>
-
-                    <details open>
-                        <summary>Podaci o plaćanju</summary>
-                        <p>
-                          <label for="i">Iznos *</label>
-                          <input type="text" id="i" name="i" pattern="[A-Z]{3}[0-9]+,[0-9]{0,2}" placeholder="RSD9999,99" required />
-                          <small>Valuta i iznos novčanih sredstava predstavlja oznaku RSD i iznos, u kome se obavezno upisuje decimalna zapeta, iza koje se ne moraju pisati nevažeće decimalne nule primer: RSD1025). Minimalni iznos naloga je RSD0,01, a maksimalni iznos naloga je RSD99999999999999,99. Pri unosu iznosa, hiljade se ne odvajaju tačkama. Nije dozvoljeno  cifru za celo mesto u iznosu. Na primer: RSD,01 nije ispravan iznos, ispravno je RSD0,01;</small>
-
-                          <label for="sf">Šifra Plaćanja</label>
-                          <input type="text" id="sf" name="sf" pattern="[1239][0-9]{2}" placeholder="121" />
-                          <small>Šifra plaćanja označava numerički podatak od tri cifre, od kojih prva identifikuje način plaćanja, a druge dve osnovu</small>
-
-                          <label for="s">Svrha Plaćanja</label>
-                          <input type="text" id="s" name="s" />
-                          <small>Svrha plaćanja označava podatke o nameni i osnovu prenosa, odnosno uplate novčanih sredstava</small>
-
-                          <label for="rp">Referenca Plaćanja</label>
-                          <input type="text" id="rp" name="rp" />
-                          <small>Referenca koja identifikuje transakciju na prodajnom mestu predstavlja jedinstveni identifikator samog plaćanja, ukupne dužine 19</small>
-
-                          <label for="jf">Jednokratna Šifra</label>
-                          <input type="text" id="jf" name="jf" />
-                          <small>Jednokratna šifra platioca predstavlja TOTR vrednost (jednokratnu šifru čije je važenje vremenski ograničeno, npr. pet minuta).Banka platioca stvara jednokratnu šifru, ali i izvršava autorizaciju transakcije plaćanja</small>
-
-                        </p>
-                    </details>
-
-                    <details>
-                        <summary>Podešavanje izgleda QR Koda</summary>
-                        <div id="settings">
-                          <h4>Podešavanje izgleda QR Koda</h4>
-
-                          <label for="fg">Boja QR Koda</label>
-                          <input type="color" id="fg" name="fg" value="#000000">
-
-                          <label for="bg">Boja Pozadine QR Koda</label>
-                          <input type="color" id="bg" name="bg" value="#ffffff">
-
-                          <label for="width">Širina QR Koda</label>
-                          <input type="number" id="width" name="width" />
-
-                          <label for="height">Visina QR Koda</label>
-                          <input type="number" id="height" name="height" />
-
-                          <label for="margin">Margina QR Koda</label>
-                          <input type="range" id="margin" name="margin" min="0" max="25" value="5">
-                        </div>
-                    </details>
-
-                    <details>
-                        <summary>IPS Settings</summary>
-                        <p>
-                          <input type="hidden" name="v" value="01" />
-                          <input type="hidden" name="c" value="1" />
-                          <label for="k">Kod *</label>
-                          <select id="k" name="k">
-                              <option value="PR" selected>PR – za QR kod na štampanom računu velikih izdavalaca računa</option>
-                              <option value="PT">PT – za QR kod na prodajnom mestu, prikazan od strane trgovca</option>
-                              <option value="PK">PK – za QR kod na prodajnom mestu, prikazan od strane kupca</option>
-                              <option value="EK">EK – za QR kod u aplikaciji e-commerce</option>
-                          </select>
-                        </p>
-                    </details>
-
-                </div>
-
-                <div class="column">
-                  <article class="sticky">
-                    <input type="submit" value="Generiši QR Kod" role="button" class="outline" />
-                    <ul id="errors" class="errors"></ul>
-                    <div id="result">
-                        <div class="box">
-                            <canvas id="output"></canvas>
-                        </div>
-                        <div class="box">
-                            <span><strong>Sadržaj IPS QR Koda</strong></span>
-                            <pre id="code"></pre>
-                        </div>
-                    </div>
-                    </article>
-                </div>
-            </div>
-          </form>
-        </div>
-    </main>
-    <script src="./dist/main.js"></script>
-    <script>
-        const errors = document.getElementById('errors');
-        const form = document.getElementById('generator');
-        const result = document.getElementById('result');
-        result.classList.add('hidden');
-        errors.classList.add('hidden');
-
-        const setError = (message, path) => {
-            errors.classList.remove('hidden');
-            errors.innerHTML += `<li>${message}</li>`;
-            const elem = document.querySelector(`[name="${path}"]`);
-            if (elem) {
-                elem.setAttribute("aria-invalid", true);
-                elem.title = message;
-                elem.focus();
-            }
-        };
-
-        const handleError = (error) => {
-            console.error(error)
-            setError(error.message, error.path);
-        };
-
-        const resubmit = e => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            try {
-
-            // Hide the result
-            result.classList.add('hidden');
-            errors.classList.add('hidden');
-            
-            // Clear errors
-            errors.innerHTML = '';
-            document.querySelectorAll(`form [name]`).forEach(elem => {
-                elem.removeAttribute("aria-invalid");
-                elem.removeAttribute("title");
-            });
-
-
-            // Collect form data
-            var formData = new FormData(form);
-            var data = {};
-            formData.forEach((value, key) => {
-                if (value !== "") data[key] = value;
-            });
-            var { width, height, margin, scale, fg:dark, bg:light, ...qrCodeParams } = data;
-            var options = { width, height, margin, color: { light, dark } };
-
-            // Generate QR Code
-            IpsQrCode(qrCodeParams)
-                .then(ipsString => {
-                    console.log(`Sadržaj QR koda je: '${ipsString}'`);
-                    result.classList.remove('hidden');
-                    code.innerText = ipsString;
-                    const output = document.getElementById('output');
-                    QRCode.toCanvas(output, ipsString, options);
-                })
-                .catch(handleError);
-            } catch (error) {
-                handleError(error);
-            }
-
-            return false;
-        };
-
-        document.querySelectorAll('#settings input').forEach(elem => 
-            elem.addEventListener('change', e => {
-                resubmit(e);
-            })
-        );
-        document.getElementById('generator').addEventListener('submit', resubmit);
-    </script>
-    <script>
-    const bgColor = "#11191f";
-    const fgColor = "rgb(115, 130, 140)";
-    const pixelSize = 20;
-    
-    function init(canvas) {
-      const screenWidth = window.innerWidth;
-      const screenHeight = 200;
-      canvas.width = Math.ceil(screenWidth/pixelSize);
-      canvas.height = Math.ceil(screenHeight/pixelSize);
-      canvas.style.width = `${screenWidth}px`;
-      canvas.style.height = `${screenHeight}px`;
-
-      const ctx = canvas.getContext("2d");
-      for (let x = 0; x < canvas.width; x++) {
-        for (let y = 0; y < canvas.height; y++) {
-          ctx.fillStyle = Math.random() > 0.5 ? fgColor : bgColor;
-          ctx.fillRect(x, y, 1, 1);
-        }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0e1116;
+        --surface: #161b22;
+        --surface-2: #1d232c;
+        --border: #2a313b;
+        --border-strong: #3a4350;
+        --text: #e8ecf1;
+        --text-muted: #9aa5b3;
+        --accent: #4c9eea;
+        --accent-hover: #6cb0f0;
+        --accent-soft: #15283d;
+        --on-accent: #06121f;
+        --ok: #4cc38a;
+        --ok-soft: #12291e;
+        --err: #ff7a6b;
+        --err-soft: #34181a;
+        --warn: #e8b34a;
+        --focus: 0 0 0 3px rgba(76, 158, 234, 0.4);
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+        --pixel-a: #1a2029;
+        --pixel-b: #141920;
       }
     }
-    init(document.getElementById("backdrop"));
-    window.addEventListener("resize", () => init(document.getElementById("backdrop")));
-    </script>
-  </body>
-</html>
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0e1116;
+      --surface: #161b22;
+      --surface-2: #1d232c;
+      --border: #2a313b;
+      --border-strong: #3a4350;
+      --text: #e8ecf1;
+      --text-muted: #9aa5b3;
+      --accent: #4c9eea;
+      --accent-hover: #6cb0f0;
+      --accent-soft: #15283d;
+      --on-accent: #06121f;
+      --ok: #4cc38a;
+      --ok-soft: #12291e;
+      --err: #ff7a6b;
+      --err-soft: #34181a;
+      --warn: #e8b34a;
+      --focus: 0 0 0 3px rgba(76, 158, 234, 0.4);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+      --pixel-a: #1a2029;
+      --pixel-b: #141920;
+    }
 
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.5 var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
+    /* Header */
+    .hero { position: relative; overflow: hidden; }
+    .hero canvas {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      image-rendering: pixelated; opacity: 0.9;
+    }
+    .hero::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 20%, var(--bg) 100%);
+    }
+    .topbar {
+      position: relative; z-index: 1;
+      max-width: 1160px; margin: 0 auto; padding: 20px 16px 40px;
+      display: flex; align-items: flex-start; gap: 16px; justify-content: space-between;
+    }
+    .brand h1 { margin: 0; font-size: clamp(1.5rem, 3.4vw, 2.1rem); letter-spacing: -0.02em; line-height: 1.2; }
+    .brand p { margin: 6px 0 0; color: var(--text-muted); max-width: 52ch; }
+    .top-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .icon-btn {
+      display: inline-grid; place-items: center;
+      width: 40px; height: 40px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text);
+      cursor: pointer; text-decoration: none;
+    }
+    .icon-btn:hover { border-color: var(--border-strong); }
+    .icon-btn svg { width: 20px; height: 20px; }
+
+    /* Layout */
+    .layout {
+      max-width: 1160px; margin: -16px auto 0; padding: 0 16px 48px;
+      display: grid; gap: 24px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+      align-items: start; position: relative; z-index: 1;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: minmax(0, 1fr); padding-bottom: 96px; }
+    }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    .section { padding: 20px; }
+    .section + .section { border-top: 1px solid var(--border); }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    .section-head h2 { margin: 0; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .section-head .step {
+      display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 8px;
+      border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+      font-size: 0.78rem; font-weight: 700; vertical-align: 1px;
+    }
+
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between;
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+    }
+    .toolbar .note { color: var(--text-muted); font-size: 0.86rem; display: flex; align-items: center; gap: 6px; }
+    .toolbar .note svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .toolbar .buttons { display: flex; gap: 8px; }
+
+    /* Fields */
+    .fields { display: grid; gap: 16px; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .field { grid-column: span 6; min-width: 0; }
+    .field.half { grid-column: span 3; }
+    .field.third { grid-column: span 2; }
+    @media (max-width: 560px) {
+      .field.half, .field.third { grid-column: span 6; }
+    }
+    .label-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+    label, .label { font-weight: 600; font-size: 0.9rem; }
+    .req { color: var(--err); margin-left: 2px; }
+    .opt { font-weight: 400; color: var(--text-muted); font-size: 0.82rem; margin-left: 4px; }
+    .counter { font-size: 0.78rem; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .counter.over { color: var(--err); font-weight: 600; }
+
+    .input, select.input, textarea.input {
+      width: 100%; min-height: 44px; padding: 10px 12px;
+      border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+      background: var(--surface); outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    textarea.input { resize: vertical; min-height: 64px; line-height: 1.4; }
+    .input:focus { border-color: var(--accent); box-shadow: var(--focus); }
+    .input::placeholder { color: var(--text-muted); opacity: 0.7; }
+    .mono { font-family: var(--mono); letter-spacing: 0.02em; }
+    .field.invalid .input { border-color: var(--err); }
+    .field.invalid .input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--err) 30%, transparent); }
+
+    .affix { display: flex; align-items: stretch; }
+    .affix .input { border-top-right-radius: 0; border-bottom-right-radius: 0; text-align: right; font-variant-numeric: tabular-nums; font-size: 1.1rem; font-weight: 600; }
+    .affix .suffix {
+      display: grid; place-items: center; padding: 0 14px;
+      border: 1px solid var(--border-strong); border-left: 0;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: var(--surface-2); color: var(--text-muted); font-weight: 600;
+    }
+    .split { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 8px; }
+    @media (max-width: 420px) { .split { grid-template-columns: minmax(0, 1fr); } }
+
+    .hint { margin: 6px 0 0; font-size: 0.82rem; color: var(--text-muted); }
+    .msg { margin: 6px 0 0; font-size: 0.84rem; display: none; align-items: flex-start; gap: 6px; }
+    .msg svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
+    .field.invalid .msg.error { display: flex; color: var(--err); }
+    .field.valid .msg.success { display: flex; color: var(--ok); }
+    .field.invalid .hint { display: none; }
+    .fix-btn {
+      margin-left: 4px; padding: 0 6px; border: 0; background: none;
+      color: var(--accent); text-decoration: underline; cursor: pointer; font-size: inherit;
+    }
+
+    .segmented { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    @media (max-width: 560px) { .segmented { grid-template-columns: repeat(2, 1fr); } }
+    .segmented input { position: absolute; opacity: 0; pointer-events: none; }
+    .segmented label {
+      display: block; padding: 8px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+      cursor: pointer; font-weight: 500; font-size: 0.84rem; line-height: 1.3;
+    }
+    .segmented label b { display: block; font-size: 0.95rem; }
+    .segmented label span { color: var(--text-muted); }
+    .segmented input:checked + label { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+    .segmented input:focus-visible + label { box-shadow: var(--focus); }
+
+    details.more > summary {
+      list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 16px 20px; font-weight: 600;
+    }
+    details.more > summary::-webkit-details-marker { display: none; }
+    details.more > summary .chev { width: 18px; height: 18px; transition: transform 0.2s; color: var(--text-muted); }
+    details.more[open] > summary .chev { transform: rotate(180deg); }
+    details.more > summary small { font-weight: 400; color: var(--text-muted); display: block; font-size: 0.84rem; }
+    details.more > .section { padding-top: 4px; border-top: 0; }
+    .card > details.more { border-top: 1px solid var(--border); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 40px; padding: 8px 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong); background: var(--surface); color: var(--text);
+      font-weight: 600; font-size: 0.9rem; cursor: pointer; text-decoration: none; white-space: nowrap;
+      transition: background 0.15s, border-color 0.15s, transform 0.05s;
+    }
+    .btn:hover { border-color: var(--text-muted); }
+    .btn:active { transform: translateY(1px); }
+    .btn:focus-visible, .icon-btn:focus-visible, .fix-btn:focus-visible, details.more > summary:focus-visible { outline: none; box-shadow: var(--focus); }
+    .btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn.ghost { border-color: transparent; background: transparent; }
+    .btn.ghost:hover { background: var(--surface-2); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn.sm { min-height: 34px; padding: 6px 10px; font-size: 0.84rem; }
+
+    /* Preview */
+    .preview { position: sticky; top: 16px; }
+    .preview-body { padding: 20px; }
+    .status {
+      display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem;
+      padding: 8px 12px; border-radius: 999px; width: fit-content; margin: 0 auto 16px;
+      background: var(--surface-2); color: var(--text-muted);
+    }
+    .status .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .status.ok { background: var(--ok-soft); color: var(--ok); }
+    .status.bad { background: var(--err-soft); color: var(--err); }
+
+    .qr-frame {
+      position: relative; margin: 0 auto; width: 100%; max-width: 300px; aspect-ratio: 1;
+      border-radius: 12px; overflow: hidden; background: #fff;
+      border: 1px solid var(--border);
+    }
+    .qr-frame canvas { display: block; width: 100% !important; height: 100% !important; image-rendering: pixelated; transition: opacity 0.2s, filter 0.2s; }
+    .qr-frame.empty canvas { opacity: 0.12; filter: blur(2px) grayscale(1); }
+    .qr-frame .overlay {
+      position: absolute; inset: 0; display: none; place-items: center; text-align: center; padding: 24px;
+      color: #3b4452; font-size: 0.9rem; font-weight: 500;
+    }
+    .qr-frame.empty .overlay { display: grid; }
+    .overlay svg { width: 36px; height: 36px; margin: 0 auto 8px; display: block; color: #8a94a3; }
+
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 18px; }
+    .actions .btn.primary { grid-column: span 2; min-height: 46px; font-size: 0.95rem; }
+
+    .summary { margin: 20px 0 0; padding: 0; display: grid; gap: 10px; font-size: 0.88rem; }
+    .summary div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px; }
+    .summary dt { color: var(--text-muted); }
+    .summary dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; white-space: pre-line; }
+    .summary .amount { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    .payload { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px; }
+    .payload-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .payload-head span { font-size: 0.84rem; font-weight: 600; color: var(--text-muted); }
+    .payload pre {
+      margin: 0; padding: 12px; border-radius: var(--radius-sm); background: var(--surface-2);
+      font: 0.8rem/1.6 var(--mono); white-space: pre-wrap; word-break: break-all; max-height: 180px; overflow: auto;
+    }
+    .payload pre .tag { color: var(--accent); font-weight: 700; }
+    .payload pre .sep { color: var(--text-muted); }
+
+    .appearance { display: grid; gap: 14px; }
+    .color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .color-input { display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 6px 10px; min-height: 44px; }
+    .color-input input[type="color"] { width: 30px; height: 30px; padding: 0; border: 1px solid var(--border); border-radius: 8px; background: none; cursor: pointer; }
+    .color-input input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-input input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 7px; }
+    .color-input span { font: 0.84rem var(--mono); color: var(--text-muted); }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .warn { color: var(--warn); font-size: 0.84rem; margin: 0; }
+
+    footer { max-width: 1160px; margin: 0 auto; padding: 0 16px 40px; color: var(--text-muted); font-size: 0.84rem; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+    footer code { font-family: var(--mono); background: var(--surface-2); padding: 1px 6px; border-radius: 6px; }
+
+    /* Mobile bottom bar */
+    .mobile-bar {
+      display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      align-items: center; gap: 12px; justify-content: space-between;
+    }
+    .mobile-bar .status { margin: 0; min-width: 0; font-size: 0.84rem; }
+    .mobile-bar .status span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mobile-bar .btn { flex-shrink: 0; }
+    @media (max-width: 900px) {
+      .mobile-bar { display: flex; }
+      .preview { position: static; }
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; z-index: 30; transform: translate(-50%, 20px);
+      background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 10px;
+      font-weight: 600; font-size: 0.9rem; box-shadow: var(--shadow);
+      opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s;
+      max-width: calc(100vw - 32px);
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    @media (max-width: 900px) { .toast { bottom: 88px; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+
+    @media print {
+      body { background: #fff; color: #000; }
+      .hero, .form-col, footer, .mobile-bar, .actions, .payload, .preview-appearance, .status, .toast { display: none !important; }
+      .layout { display: block; margin: 0; padding: 0; }
+      .card { box-shadow: none; border: 0; }
+      .qr-frame { max-width: 8cm; border: 0; }
+      .summary { max-width: 12cm; margin: 1cm auto 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <canvas id="backdrop" aria-hidden="true"></canvas>
+    <div class="topbar">
+      <div class="brand">
+        <h1>IPS QR generator</h1>
+        <p>Napravite QR kod za instant plaćanje (NBS IPS). Popunite podatke, a kod se generiše dok kucate.</p>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Promeni temu" title="Promeni temu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+        </button>
+        <a class="icon-btn" href="https://github.com/ArtBIT/ips-qr-code" aria-label="Izvorni kod na GitHub-u" title="GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <form id="form" class="form-col card" novalidate autocomplete="off">
+      <div class="toolbar">
+        <span class="note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          Podaci ostaju u vašem pregledaču.
+        </span>
+        <span class="buttons">
+          <button type="button" class="btn sm ghost" id="fill-example">Popuni primer</button>
+          <button type="button" class="btn sm ghost" id="clear">Obriši sve</button>
+        </span>
+      </div>
+
+      <section class="section" aria-labelledby="h-recipient">
+        <div class="section-head"><h2 id="h-recipient"><span class="step">1</span>Primalac</h2></div>
+        <div class="fields">
+          <div class="field" data-field="n">
+            <div class="label-row">
+              <label for="n">Naziv i sedište primaoca<span class="req" aria-hidden="true">*</span></label>
+              <span class="counter" data-counter-for="n" data-max="70"></span>
+            </div>
+            <textarea class="input" id="n" name="n" rows="2" maxlength="70" required placeholder="Preduzeće d.o.o.&#10;Ulica 1, Beograd" aria-describedby="n-hint n-err"></textarea>
+            <p class="hint" id="n-hint">Najviše 3 reda i 70 znakova.</p>
+            <p class="msg error" id="n-err" role="alert"></p>
+          </div>
+          <div class="field" data-field="r">
+            <div class="label-row"><label for="r">Račun primaoca<span class="req" aria-hidden="true">*</span></label></div>
+            <input class="input mono" id="r" name="r" inputmode="numeric" required placeholder="160-0000000123456-78" aria-describedby="r-hint r-err r-ok" />
+            <p class="hint" id="r-hint">Može i sa crticama ili bez vodećih nula, npr. 160-123456-78.</p>
+            <p class="msg error" id="r-err" role="alert"></p>
+            <p class="msg success" id="r-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Kontrolni broj je ispravan</span></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="h-payment">
+        <div class="section-head"><h2 id="h-payment"><span class="step">2</span>Plaćanje</h2></div>
+        <div class="fields">
+          <div class="field half" data-field="i">
+            <div class="label-row"><label for="i">Iznos<span class="req" aria-hidden="true">*</span></label></div>
+            <div class="affix">
+              <input class="input" id="i" name="i" inputmode="decimal" required placeholder="0,00" aria-describedby="i-err" />
+              <span class="suffix" aria-hidden="true">RSD</span>
+            </div>
+            <p class="msg error" id="i-err" role="alert"></p>
+          </div>
+          <div class="field half" data-field="sf">
+            <div class="label-row"><label for="sf">Šifra plaćanja<span class="req" aria-hidden="true">*</span></label></div>
+            <input class="input mono" id="sf" name="sf" list="sf-list" inputmode="numeric" maxlength="3" required placeholder="221" aria-describedby="sf-hint sf-err" />
+            <datalist id="sf-list">
+              <option value="221">Promet robe i usluga, finalna potrošnja</option>
+              <option value="220">Promet robe i usluga, međufazna potrošnja</option>
+              <option value="222">Usluge javnih preduzeća</option>
+              <option value="223">Investicije u objekte i opremu</option>
+              <option value="240">Zarade i druga primanja zaposlenih</option>
+              <option value="241">Neoporeziva primanja zaposlenih</option>
+              <option value="253">Uplata javnih prihoda izuzev poreza i doprinosa po odbitku</option>
+              <option value="254">Uplata poreza i doprinosa po odbitku</option>
+              <option value="289">Transakcije po nalogu građana</option>
+              <option value="290">Druge transakcije</option>
+            </datalist>
+            <p class="hint" id="sf-hint">Tri cifre. Prva je 1 (gotovinsko) ili 2 (bezgotovinsko).</p>
+            <p class="msg error" id="sf-err" role="alert"></p>
+          </div>
+          <div class="field" data-field="s">
+            <div class="label-row">
+              <label for="s">Svrha plaćanja<span class="opt">(opciono)</span></label>
+              <span class="counter" data-counter-for="s" data-max="35"></span>
+            </div>
+            <input class="input" id="s" name="s" maxlength="35" placeholder="npr. Račun br. 123/2026" aria-describedby="s-err" />
+            <p class="msg error" id="s-err" role="alert"></p>
+          </div>
+          <div class="field" data-field="ro">
+            <div class="label-row"><label for="ro">Model i poziv na broj<span class="opt">(opciono)</span></label></div>
+            <div class="split">
+              <select class="input" id="ro-model" name="roModel" aria-label="Model">
+                <option value="">Bez modela</option>
+                <option value="97">Model 97</option>
+                <option value="22">Model 22</option>
+                <option value="11">Model 11</option>
+              </select>
+              <input class="input mono" id="ro" name="ro" maxlength="33" placeholder="Poziv na broj" aria-describedby="ro-hint ro-err ro-ok" />
+            </div>
+            <p class="hint" id="ro-hint">Za model 97 upišite kontrolni broj (2 cifre) pa ostatak poziva na broj.</p>
+            <p class="msg error" id="ro-err" role="alert"></p>
+            <p class="msg success" id="ro-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Kontrolni broj je ispravan</span></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="h-payer">
+        <div class="section-head"><h2 id="h-payer"><span class="step">3</span>Platilac<span class="opt">(opciono)</span></h2></div>
+        <div class="fields">
+          <div class="field" data-field="p">
+            <div class="label-row">
+              <label for="p">Naziv i adresa platioca</label>
+              <span class="counter" data-counter-for="p" data-max="70"></span>
+            </div>
+            <textarea class="input" id="p" name="p" rows="2" maxlength="70" placeholder="Ime Prezime&#10;Ulica 1, Novi Sad" aria-describedby="p-hint p-err"></textarea>
+            <p class="hint" id="p-hint">Ostavite prazno ako QR kod plaća bilo ko.</p>
+            <p class="msg error" id="p-err" role="alert"></p>
+          </div>
+        </div>
+      </section>
+
+      <details class="more" id="advanced">
+        <summary>
+          <span>Napredna podešavanja<small>Tip koda, MCC, reference i jednokratna šifra</small></span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="section">
+          <div class="fields">
+            <fieldset class="field" style="border:0;padding:0;margin:0">
+              <legend class="label" style="margin-bottom:6px">Tip QR koda</legend>
+              <div class="segmented">
+                <input type="radio" name="k" id="k-PR" value="PR" checked /><label for="k-PR"><b>PR</b><span>Štampani račun</span></label>
+                <input type="radio" name="k" id="k-PT" value="PT" /><label for="k-PT"><b>PT</b><span>Prodajno mesto, trgovac</span></label>
+                <input type="radio" name="k" id="k-PK" value="PK" /><label for="k-PK"><b>PK</b><span>Prodajno mesto, kupac</span></label>
+                <input type="radio" name="k" id="k-EK" value="EK" /><label for="k-EK"><b>EK</b><span>E-commerce</span></label>
+              </div>
+            </fieldset>
+            <div class="field third" data-field="m">
+              <div class="label-row"><label for="m">MCC<span class="opt" id="m-opt">(opciono)</span><span class="req" id="m-req" hidden>*</span></label></div>
+              <input class="input mono" id="m" name="m" inputmode="numeric" maxlength="4" placeholder="5411" aria-describedby="m-hint m-err" />
+              <p class="hint" id="m-hint">Kod kategorije trgovca (ISO 18245).</p>
+              <p class="msg error" id="m-err" role="alert"></p>
+            </div>
+            <div class="field third" data-field="js">
+              <div class="label-row"><label for="js">Jednokratna šifra</label></div>
+              <input class="input mono" id="js" name="js" inputmode="numeric" maxlength="5" placeholder="12345" aria-describedby="js-hint js-err" />
+              <p class="hint" id="js-hint">5 cifara.</p>
+              <p class="msg error" id="js-err" role="alert"></p>
+            </div>
+            <div class="field third" data-field="rp">
+              <div class="label-row"><label for="rp">Referenca plaćanja</label></div>
+              <input class="input mono" id="rp" name="rp" inputmode="numeric" maxlength="19" aria-describedby="rp-hint rp-err" />
+              <p class="hint" id="rp-hint">19 cifara.</p>
+              <p class="msg error" id="rp-err" role="alert"></p>
+            </div>
+            <div class="field" data-field="rl">
+              <div class="label-row">
+                <label for="rl">Referenca primaoca</label>
+                <span class="counter" data-counter-for="rl" data-max="140"></span>
+              </div>
+              <input class="input" id="rl" name="rl" maxlength="140" aria-describedby="rl-err" />
+              <p class="msg error" id="rl-err" role="alert"></p>
+            </div>
+          </div>
+        </div>
+      </details>
+    </form>
+
+    <aside class="preview card" id="preview" aria-labelledby="h-preview">
+      <h2 id="h-preview" class="sr-only">Pregled QR koda</h2>
+      <div class="preview-body">
+        <div class="status" id="status" role="status" aria-live="polite"><span class="dot"></span><span id="status-text">Popunite obavezna polja</span></div>
+        <div class="qr-frame empty" id="qr-frame">
+          <canvas id="qr" width="300" height="300" aria-label="IPS QR kod" role="img"></canvas>
+          <div class="overlay"><div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20v.01M17 20h4v-3"/></svg>
+            <span id="overlay-text">QR kod će se pojaviti ovde</span>
+          </div></div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn primary" id="download-png" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+            Preuzmi PNG
+          </button>
+          <button type="button" class="btn" id="download-svg" disabled>SVG</button>
+          <button type="button" class="btn" id="copy-image" disabled>Kopiraj sliku</button>
+          <button type="button" class="btn" id="share" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+            Podeli link
+          </button>
+          <button type="button" class="btn" id="print" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7"/></svg>
+            Štampaj
+          </button>
+        </div>
+
+        <dl class="summary" id="summary" hidden>
+          <div><dt>Iznos</dt><dd class="amount" id="sum-i"></dd></div>
+          <div><dt>Primalac</dt><dd id="sum-n"></dd></div>
+          <div><dt>Račun</dt><dd class="mono" id="sum-r"></dd></div>
+          <div id="sum-s-row"><dt>Svrha</dt><dd id="sum-s"></dd></div>
+          <div id="sum-ro-row"><dt>Poziv na broj</dt><dd class="mono" id="sum-ro"></dd></div>
+          <div id="sum-p-row"><dt>Platilac</dt><dd id="sum-p"></dd></div>
+        </dl>
+
+        <div class="payload" id="payload" hidden>
+          <div class="payload-head">
+            <span>Sadržaj QR koda</span>
+            <button type="button" class="btn sm ghost" id="copy-payload">Kopiraj tekst</button>
+          </div>
+          <pre id="payload-text"></pre>
+        </div>
+      </div>
+
+      <details class="more preview-appearance">
+        <summary>
+          <span>Izgled QR koda<small>Boje, veličina i margina</small></span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="section appearance" id="appearance">
+          <div class="color-row">
+            <div>
+              <label class="label" for="fg">Boja koda</label>
+              <div class="color-input" style="margin-top:6px"><input type="color" id="fg" value="#000000" /><span id="fg-val">#000000</span></div>
+            </div>
+            <div>
+              <label class="label" for="bg">Pozadina</label>
+              <div class="color-input" style="margin-top:6px"><input type="color" id="bg" value="#ffffff" /><span id="bg-val">#ffffff</span></div>
+            </div>
+          </div>
+          <p class="warn" id="contrast-warn" hidden>Slab kontrast: neke bankarske aplikacije možda neće pročitati kod. Koristite taman kod na svetloj pozadini.</p>
+          <div>
+            <div class="label-row"><label for="size">Veličina za preuzimanje</label><span class="counter" id="size-val"></span></div>
+            <input type="range" id="size" min="256" max="2048" step="64" value="1024" />
+          </div>
+          <div>
+            <div class="label-row"><label for="margin">Margina</label><span class="counter" id="margin-val"></span></div>
+            <input type="range" id="margin" min="0" max="8" step="1" value="4" />
+          </div>
+          <div><button type="button" class="btn sm" id="reset-look">Vrati podrazumevano</button></div>
+        </div>
+      </details>
+    </aside>
+  </main>
+
+  <footer>
+    <span>Specifikacija: <a href="https://nbs.rs/QRcode/info.html">NBS IPS QR kod</a></span>
+    <span>CLI i biblioteka: <code>npm i -g ips-qr-code</code></span>
+    <span><a href="https://github.com/ArtBIT/ips-qr-code">GitHub</a> · MIT licenca</span>
+  </footer>
+
+  <div class="mobile-bar" id="mobile-bar">
+    <div class="status" id="m-status"><span class="dot"></span><span id="m-status-text">Popunite obavezna polja</span></div>
+    <button type="button" class="btn primary" id="m-show">Prikaži QR</button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+  (() => {
+    "use strict";
+
+    const $ = (sel) => document.querySelector(sel);
+    const form = $("#form");
+    const STORAGE_KEY = "ips-qr-code:v2";
+    const FIELDS = ["n", "r", "i", "sf", "s", "roModel", "ro", "p", "k", "m", "js", "rp", "rl"];
+    const LOOK_DEFAULTS = { fg: "#000000", bg: "#ffffff", size: 1024, margin: 4 };
+    const EXAMPLE = {
+      n: "GitHub Ltd.\nBeograd", r: "160-0000000012345-95", i: "1.295,00", sf: "221",
+      s: "Primer uplate", roModel: "97", ro: "", p: "Pera Perić\nNovi Sad",
+    };
+
+    const storage = {
+      get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } },
+      set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} },
+    };
+
+    /* ---------- Parsing and validation (mirrors lib/schema.js with friendlier messages) ---------- */
+
+    const digits = (s) => String(s || "").replace(/\D/g, "");
+
+    const mod97 = (input) => {
+      let control = 0, base = 100;
+      [...String(input)].reverse().forEach((ch) => {
+        control = (control + base * parseInt(ch, 10)) % 97;
+        base = (base * 10) % 97;
+      });
+      return 98 - control;
+    };
+    const mod22 = (input) => {
+      let sum = 0;
+      [...String(input)].reverse().forEach((ch, idx) => (sum += (idx + 1) * parseInt(ch, 10)));
+      return (11 - (sum % 11)) % 10;
+    };
+    const lettersToDigits = (s) => [...s].map((ch) => (/[A-Z]/.test(ch) ? String(ch.charCodeAt(0) - 55) : ch)).join("");
+
+    const bigMod = (numStr, m) => {
+      let r = 0;
+      for (const ch of numStr) r = (r * 10 + +ch) % m;
+      return r;
+    };
+
+    function parseAccount(raw) {
+      const d = digits(raw);
+      if (!d) return { empty: true };
+      if (/[^0-9\s-]/.test(raw)) return { error: "Račun može da sadrži samo cifre i crtice." };
+      if (d.length < 6) return { error: "Račun je prekratak. Format je 3 cifre banke, broj računa i 2 kontrolne cifre." };
+      if (d.length > 18) return { error: "Račun ima najviše 18 cifara." };
+      const normalized = d.slice(0, 3) + d.slice(3, -2).padStart(13, "0") + d.slice(-2);
+      const expected = 98 - bigMod(normalized.slice(0, 16) + "00", 97);
+      if (+normalized.slice(-2) !== expected) {
+        return { error: "Kontrolni broj računa nije ispravan. Proverite da li ste dobro prepisali račun." };
+      }
+      return { value: normalized, pretty: `${normalized.slice(0, 3)}-${normalized.slice(3, 16)}-${normalized.slice(16)}` };
+    }
+
+    function parseAmount(raw) {
+      let s = String(raw || "").replace(/\s|RSD|din\.?/gi, "");
+      if (!s) return { empty: true };
+      if (!/^[0-9.,]+$/.test(s)) return { error: "Iznos može da sadrži samo cifre, tačku i zarez." };
+      const lastComma = s.lastIndexOf(","), lastDot = s.lastIndexOf(".");
+      let intPart, decPart = "";
+      if (lastComma > -1 && lastDot > -1) {
+        const dec = Math.max(lastComma, lastDot);
+        intPart = s.slice(0, dec); decPart = s.slice(dec + 1);
+      } else if (lastComma > -1) {
+        intPart = s.slice(0, lastComma); decPart = s.slice(lastComma + 1);
+      } else if (lastDot > -1) {
+        // "1.295" or "1.295.000" are thousands, "12.5" is a decimal
+        if (/^\d{1,3}(\.\d{3})+$/.test(s)) intPart = s;
+        else { intPart = s.slice(0, lastDot); decPart = s.slice(lastDot + 1); }
+      } else intPart = s;
+      intPart = intPart.replace(/[.,]/g, "");
+      if (/[.,]/.test(decPart)) return { error: "Iznos nije ispravno napisan." };
+      if (decPart.length > 2) return { error: "Iznos može imati najviše 2 decimale." };
+      intPart = intPart.replace(/^0+(?=\d)/, "") || "0";
+      decPart = decPart.padEnd(2, "0");
+      if (intPart.length > 14) return { error: "Maksimalni iznos je 99.999.999.999.999,99 RSD." };
+      if (intPart === "0" && decPart === "00") return { error: "Iznos mora biti veći od nule (najmanje 0,01)." };
+      const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      return { value: `RSD${intPart},${decPart}`, pretty: `${grouped},${decPart}` };
+    }
+
+    function checkReference(model, raw) {
+      const clean = String(raw || "").toUpperCase().replace(/[\s-]/g, "");
+      if (!clean) return { empty: true };
+      if (model === "97") {
+        if (!/^[0-9A-Z]+$/.test(clean)) return { error: "Poziv na broj za model 97 može da sadrži samo cifre, slova, razmake i crtice." };
+        if (clean.length < 3) return { error: "Unesite kontrolni broj (2 cifre) i poziv na broj." };
+        if (!/^\d\d/.test(clean)) return { error: "Poziv na broj za model 97 počinje kontrolnim brojem od 2 cifre." };
+        const expected = String(mod97(lettersToDigits(clean.slice(2)))).padStart(2, "0");
+        if (clean.slice(0, 2) !== expected) {
+          return { error: `Kontrolni broj nije ispravan, za ovaj poziv na broj treba da bude ${expected}.`, fix: expected + clean.slice(2), checked: true };
+        }
+        return { value: "97" + clean, checked: true };
+      }
+      if (model === "22") {
+        if (!/^\d+$/.test(clean)) return { error: "Poziv na broj za model 22 može da sadrži samo cifre." };
+        if (clean.length < 5) return { error: "Poziv na broj za model 22 je prekratak." };
+        const body = clean.slice(3, -1);
+        const expected = String(mod22(body));
+        if (clean.slice(-1) !== expected) {
+          return { error: `Kontrolna cifra (poslednja) nije ispravna, treba da bude ${expected}.`, fix: clean.slice(0, -1) + expected, checked: true };
+        }
+        return { value: "22" + clean, checked: true };
+      }
+      if (!/^[0-9A-Z]+$/.test(clean)) return { error: "Poziv na broj može da sadrži samo cifre i slova." };
+      return { value: (model || "00") + clean };
+    }
+
+    const NAME_RE = /^[a-zA-ZšđžčćŠĐŽČĆ0-9 (){}\[\]<\/\.,:;!@#$%^&?„”“"`’‘'_~=+\-\s]*$/;
+
+    function validate(v) {
+      const errors = {}, out = { k: v.k || "PR" }, info = {};
+
+      const n = (v.n || "").trim();
+      if (!n) errors.n = "Unesite naziv primaoca.";
+      else if (n.length > 70) errors.n = "Naziv može imati najviše 70 znakova.";
+      else if (n.split("\n").length > 3) errors.n = "Naziv može imati najviše 3 reda.";
+      else if (!NAME_RE.test(n)) errors.n = "Naziv sadrži nedozvoljene znakove (dozvoljena su slova, cifre i uobičajeni znaci interpunkcije).";
+      else out.n = n;
+
+      const r = parseAccount(v.r);
+      if (r.empty) errors.r = "Unesite račun primaoca.";
+      else if (r.error) errors.r = r.error;
+      else { out.r = r.value; info.r = r.pretty; }
+
+      const i = parseAmount(v.i);
+      if (i.empty) errors.i = "Unesite iznos.";
+      else if (i.error) errors.i = i.error;
+      else { out.i = i.value; info.i = i.pretty; }
+
+      const sf = (v.sf || "").trim();
+      if (!sf) errors.sf = "Unesite šifru plaćanja.";
+      else if (!/^[12]\d{2}$/.test(sf)) errors.sf = "Šifra plaćanja ima 3 cifre i počinje sa 1 ili 2.";
+      else out.sf = sf;
+
+      const s = (v.s || "").trim();
+      if (s.length > 35) errors.s = "Svrha može imati najviše 35 znakova.";
+      else if (s) out.s = s;
+
+      const ro = checkReference(v.roModel, v.ro);
+      if (ro.error) { errors.ro = ro.error; info.roFix = ro.fix; }
+      else if (!ro.empty) {
+        if (ro.value.length > 35) errors.ro = "Model i poziv na broj mogu imati najviše 35 znakova.";
+        else { out.ro = ro.value; info.roChecked = ro.checked; }
+      }
+
+      const p = (v.p || "").trim();
+      if (p.length > 70) errors.p = "Naziv platioca može imati najviše 70 znakova.";
+      else if (p.split("\n").length > 3) errors.p = "Naziv platioca može imati najviše 3 reda.";
+      else if (p) out.p = p;
+
+      const m = (v.m || "").trim();
+      if (m && !/^\d{4}$/.test(m)) errors.m = "MCC ima tačno 4 cifre.";
+      else if (!m && out.k !== "PR") errors.m = "MCC je obavezan za tipove PT, PK i EK.";
+      else if (m) out.m = m;
+
+      const js = (v.js || "").trim();
+      if (js && !/^\d{5}$/.test(js)) errors.js = "Jednokratna šifra ima tačno 5 cifara.";
+      else if (js) out.js = js;
+
+      const rp = (v.rp || "").trim();
+      if (rp && !/^\d{19}$/.test(rp)) errors.rp = "Referenca plaćanja ima tačno 19 cifara.";
+      else if (rp) out.rp = rp;
+
+      const rl = (v.rl || "").trim();
+      if (rl.length > 140) errors.rl = "Referenca primaoca može imati najviše 140 znakova.";
+      else if (rl) out.rl = rl;
+
+      return { errors, out, info };
+    }
+
+    /* ---------- Form state ---------- */
+
+    function readForm() {
+      const fd = new FormData(form);
+      const v = {};
+      FIELDS.forEach((k) => (v[k] = fd.get(k) || ""));
+      return v;
+    }
+
+    function writeForm(v) {
+      FIELDS.forEach((k) => {
+        if (k === "k") {
+          const radio = form.querySelector(`input[name="k"][value="${v.k || "PR"}"]`);
+          if (radio) radio.checked = true;
+          return;
+        }
+        const el = form.elements[k];
+        if (el) el.value = v[k] || "";
+      });
+      if (v.m || v.js || v.rp || v.rl || (v.k && v.k !== "PR")) $("#advanced").open = true;
+    }
+
+    function readLook() {
+      return { fg: $("#fg").value, bg: $("#bg").value, size: +$("#size").value, margin: +$("#margin").value };
+    }
+    function writeLook(l) {
+      l = { ...LOOK_DEFAULTS, ...(l || {}) };
+      $("#fg").value = l.fg; $("#bg").value = l.bg; $("#size").value = l.size; $("#margin").value = l.margin;
+    }
+
+    function stateFromHash() {
+      const h = location.hash.slice(1);
+      if (!h) return null;
+      const params = new URLSearchParams(h);
+      const v = {};
+      let any = false;
+      FIELDS.forEach((k) => { if (params.has(k)) { v[k] = params.get(k); any = true; } });
+      return any ? v : null;
+    }
+    function shareUrl(v) {
+      const params = new URLSearchParams();
+      FIELDS.forEach((k) => { if (v[k] && !(k === "k" && v[k] === "PR")) params.set(k, v[k]); });
+      return `${location.origin}${location.pathname}#${params.toString()}`;
+    }
+
+    /* ---------- Rendering ---------- */
+
+    const touched = new Set();
+    let showAll = false;
+    let current = null; // { payload, out, info, v }
+    let renderToken = 0;
+
+    function setFieldState(name, error, ok) {
+      const field = form.querySelector(`[data-field="${name}"]`);
+      if (!field) return;
+      const visible = error && (showAll || touched.has(name));
+      field.classList.toggle("invalid", !!visible);
+      field.classList.toggle("valid", !error && !!ok);
+      const input = field.querySelector(".input");
+      if (input) input.setAttribute("aria-invalid", visible ? "true" : "false");
+      const msg = field.querySelector(".msg.error");
+      if (msg) msg.textContent = visible ? error : "";
+    }
+
+    function updateCounters() {
+      document.querySelectorAll("[data-counter-for]").forEach((c) => {
+        const el = form.elements[c.dataset.counterFor];
+        const max = +c.dataset.max, len = el.value.length;
+        c.textContent = len ? `${len}/${max}` : "";
+        c.classList.toggle("over", len > max);
+      });
+    }
+
+    function setStatus(kind, text) {
+      ["#status", "#m-status"].forEach((sel) => {
+        const el = $(sel);
+        el.classList.toggle("ok", kind === "ok");
+        el.classList.toggle("bad", kind === "bad");
+      });
+      $("#status-text").textContent = text;
+      $("#m-status-text").textContent = text;
+    }
+
+    function setActionsEnabled(on) {
+      ["#download-png", "#download-svg", "#copy-image", "#share", "#print"].forEach((s) => ($(s).disabled = !on));
+    }
+
+    function renderPayload(payload) {
+      const pre = $("#payload-text");
+      pre.textContent = "";
+      payload.split("|").forEach((part, idx) => {
+        if (idx) {
+          const sep = document.createElement("span");
+          sep.className = "sep"; sep.textContent = "|";
+          pre.appendChild(sep);
+        }
+        const colon = part.indexOf(":");
+        const tag = document.createElement("span");
+        tag.className = "tag"; tag.textContent = part.slice(0, colon + 1);
+        pre.appendChild(tag);
+        pre.appendChild(document.createTextNode(part.slice(colon + 1)));
+      });
+    }
+
+    function renderSummary(v, info, out) {
+      $("#sum-i").textContent = `${info.i} RSD`;
+      $("#sum-n").textContent = out.n;
+      $("#sum-r").textContent = info.r;
+      const rows = { s: out.s, ro: out.ro && out.ro.replace(/^00/, ""), p: out.p };
+      Object.entries(rows).forEach(([k, val]) => {
+        $(`#sum-${k}-row`).hidden = !val;
+        $(`#sum-${k}`).textContent = val || "";
+      });
+      if (out.ro && v.roModel) $("#sum-ro").textContent = `${v.roModel} ${out.ro.slice(2)}`;
+    }
+
+    function drawQr(canvas, payload, look, width) {
+      return new Promise((resolve, reject) =>
+        QRCode.toCanvas(canvas, payload, {
+          width, margin: look.margin, errorCorrectionLevel: "M",
+          color: { dark: look.fg, light: look.bg },
+        }, (err) => (err ? reject(err) : resolve(canvas)))
+      );
+    }
+
+    function drawPlaceholder() {
+      const canvas = $("#qr");
+      QRCode.toCanvas(canvas, "K:PR|V:01|C:1|R:000000000000000000|N:IPS QR|I:RSD0,00|SF:221", { width: 300, margin: 4 }, () => {});
+    }
+
+    const luminance = (hex) => {
+      const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+        .map((x) => (x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4));
+      return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    };
+
+    function updateLookUi() {
+      const l = readLook();
+      $("#fg-val").textContent = l.fg; $("#bg-val").textContent = l.bg;
+      $("#size-val").textContent = `${l.size} × ${l.size} px`;
+      $("#margin-val").textContent = `${l.margin} ${l.margin === 1 ? "modul" : "modula"}`;
+      const lf = luminance(l.fg), lb = luminance(l.bg);
+      const ratio = (Math.max(lf, lb) + 0.05) / (Math.min(lf, lb) + 0.05);
+      $("#contrast-warn").hidden = ratio >= 4 && lf < lb;
+    }
+
+    async function update() {
+      const token = ++renderToken;
+      const v = readForm();
+      const { errors, out, info } = validate(v);
+      updateCounters();
+
+      const isPt = v.k && v.k !== "PR";
+      $("#m-req").hidden = !isPt; $("#m-opt").hidden = isPt;
+
+      ["n", "r", "i", "sf", "s", "ro", "p", "m", "js", "rp", "rl"].forEach((k) => {
+        const ok = (k === "r" && out.r) || (k === "ro" && info.roChecked && !errors.ro);
+        setFieldState(k, errors[k], ok);
+      });
+      const roErr = $("#ro-err");
+      if (info.roFix && roErr.textContent) {
+        const btn = document.createElement("button");
+        btn.type = "button"; btn.className = "fix-btn"; btn.textContent = "Ispravi";
+        btn.addEventListener("click", () => {
+          $("#ro").value = info.roFix; touched.add("ro"); update(); save();
+        });
+        roErr.appendChild(btn);
+      }
+
+      storage.set(STORAGE_KEY, { form: v, look: readLook() });
+
+      const errorCount = Object.keys(errors).length;
+      if (errorCount) {
+        current = null;
+        $("#qr-frame").classList.add("empty");
+        $("#summary").hidden = true; $("#payload").hidden = true;
+        setActionsEnabled(false);
+        const filledAny = ["n", "r", "i"].some((k) => (v[k] || "").trim());
+        if (!filledAny) {
+          setStatus("", "Popunite obavezna polja");
+          $("#overlay-text").textContent = "QR kod će se pojaviti ovde";
+        } else {
+          setStatus("bad", errorCount === 1 ? "Proverite još 1 polje" : `Proverite još ${errorCount} polja`);
+          $("#overlay-text").textContent = "Dopunite ili ispravite označena polja";
+        }
+        if (!$("#qr-frame").dataset.placeholder) { drawPlaceholder(); $("#qr-frame").dataset.placeholder = "1"; }
+        return;
+      }
+
+      let payload;
+      try {
+        payload = await IpsQrCode(out);
+      } catch (err) {
+        if (token !== renderToken) return;
+        const path = err && err.path;
+        setStatus("bad", "Podaci nisu ispravni");
+        if (path && form.querySelector(`[data-field="${path}"]`)) { touched.add(path); setFieldState(path, err.message); }
+        else setStatus("bad", err && err.message ? err.message : "Podaci nisu ispravni");
+        setActionsEnabled(false);
+        return;
+      }
+      if (token !== renderToken) return;
+
+      await drawQr($("#qr"), payload, readLook(), 600);
+      delete $("#qr-frame").dataset.placeholder;
+      $("#qr-frame").classList.remove("empty");
+      current = { payload, out, info, v };
+      renderSummary(v, info, out);
+      renderPayload(payload);
+      $("#summary").hidden = false; $("#payload").hidden = false;
+      setActionsEnabled(true);
+      setStatus("ok", "Spreman za skeniranje");
+    }
+
+    let timer;
+    const scheduleUpdate = () => { clearTimeout(timer); timer = setTimeout(update, 120); };
+    const save = () => storage.set(STORAGE_KEY, { form: readForm(), look: readLook() });
+
+    /* ---------- Actions ---------- */
+
+    let toastTimer;
+    function toast(text) {
+      const t = $("#toast");
+      t.textContent = text; t.classList.add("show");
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+    }
+
+    function fileBase() {
+      const name = (current.out.n.split("\n")[0] || "ips").normalize("NFD").replace(/[̀-ͯ]/g, "")
+        .replace(/đ/g, "dj").replace(/Đ/g, "Dj").replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
+      return `ips-qr-${name || "kod"}-${current.info.i.replace(/\./g, "").replace(",", "-")}`;
+    }
+
+    async function pngBlob() {
+      const canvas = document.createElement("canvas");
+      const look = readLook();
+      await drawQr(canvas, current.payload, look, look.size);
+      return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    async function copyText(text, okMsg) {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast(okMsg);
+      } catch (e) {
+        window.prompt("Kopirajte tekst:", text);
+      }
+    }
+
+    $("#download-png").addEventListener("click", async () => {
+      if (!current) return;
+      downloadBlob(await pngBlob(), `${fileBase()}.png`);
+      toast("PNG je preuzet");
+    });
+
+    $("#download-svg").addEventListener("click", () => {
+      if (!current) return;
+      const look = readLook();
+      QRCode.toString(current.payload, {
+        type: "svg", margin: look.margin, errorCorrectionLevel: "M", width: look.size,
+        color: { dark: look.fg, light: look.bg },
+      }, (err, svg) => {
+        if (err) return toast("Greška pri pravljenju SVG-a");
+        downloadBlob(new Blob([svg], { type: "image/svg+xml" }), `${fileBase()}.svg`);
+        toast("SVG je preuzet");
+      });
+    });
+
+    const canCopyImage = !!(navigator.clipboard && window.ClipboardItem);
+    if (!canCopyImage) $("#copy-image").style.display = "none";
+    $("#copy-image").addEventListener("click", async () => {
+      if (!current) return;
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob() })]);
+        toast("Slika je kopirana");
+      } catch (e) {
+        toast("Pregledač ne dozvoljava kopiranje slike");
+      }
+    });
+
+    $("#share").addEventListener("click", async () => {
+      if (!current) return;
+      const url = shareUrl(current.v);
+      if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+        try { await navigator.share({ title: "IPS QR kod", text: `Uplata ${current.info.i} RSD za ${current.out.n.split("\n")[0]}`, url }); return; }
+        catch (e) { if (e.name === "AbortError") return; }
+      }
+      copyText(url, "Link je kopiran. Ko ga otvori videće isti QR kod.");
+    });
+
+    $("#print").addEventListener("click", () => window.print());
+    $("#copy-payload").addEventListener("click", () => current && copyText(current.payload, "Tekst je kopiran"));
+
+    $("#fill-example").addEventListener("click", () => {
+      const ex = { ...EXAMPLE };
+      // Compute a valid model 97 reference for the example
+      const base = "2026-0042";
+      ex.ro = String(mod97(digits(base))).padStart(2, "0") + "-" + base;
+      writeForm({ ...readForm(), ...ex, k: "PR", m: "", js: "", rp: "", rl: "" });
+      touched.clear(); showAll = false;
+      update(); save();
+      toast("Primer je popunjen");
+    });
+
+    $("#clear").addEventListener("click", () => {
+      const prev = readForm();
+      writeForm({ k: "PR" });
+      touched.clear(); showAll = false;
+      history.replaceState(null, "", location.pathname);
+      update();
+      toastUndo(prev);
+    });
+
+    function toastUndo(prev) {
+      const t = $("#toast");
+      t.textContent = "Obrisano. ";
+      const btn = document.createElement("button");
+      btn.textContent = "Vrati";
+      btn.style.cssText = "background:none;border:0;color:inherit;text-decoration:underline;font-weight:700;cursor:pointer;padding:0";
+      btn.addEventListener("click", () => { writeForm(prev); update(); t.classList.remove("show"); });
+      t.appendChild(btn);
+      t.style.pointerEvents = "auto";
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { t.classList.remove("show"); t.style.pointerEvents = ""; }, 5000);
+    }
+
+    $("#m-show").addEventListener("click", () => {
+      if (!current) {
+        showAll = true; update();
+        const first = form.querySelector(".field.invalid .input");
+        if (first) { first.scrollIntoView({ behavior: "smooth", block: "center" }); first.focus({ preventScroll: true }); }
+        return;
+      }
+      $("#preview").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    $("#reset-look").addEventListener("click", () => { writeLook(LOOK_DEFAULTS); updateLookUi(); update(); });
+    ["#fg", "#bg", "#size", "#margin"].forEach((s) =>
+      $(s).addEventListener("input", () => { updateLookUi(); scheduleUpdate(); })
+    );
+
+    /* ---------- Input behaviour ---------- */
+
+    form.addEventListener("input", (e) => {
+      const name = e.target.name;
+      if (name === "roModel") touched.add("ro");
+      if (name === "k") touched.add("m");
+      scheduleUpdate();
+    });
+    form.addEventListener("focusout", (e) => {
+      const el = e.target, name = el.name;
+      if (!name || name === "k") return;
+      if ((el.value || "").trim()) touched.add(name === "roModel" ? "ro" : name);
+      // Tidy formatting on blur
+      if (name === "r") { const r = parseAccount(el.value); if (r.pretty) el.value = r.pretty; }
+      if (name === "i") { const i = parseAmount(el.value); if (i.pretty) el.value = i.pretty; }
+      update();
+    });
+    form.addEventListener("submit", (e) => { e.preventDefault(); showAll = true; update(); });
+
+    // Keep numeric-only fields clean as the user types or pastes
+    ["sf", "m", "js", "rp"].forEach((name) => {
+      form.elements[name].addEventListener("input", (e) => {
+        const cleaned = e.target.value.replace(/\D/g, "");
+        if (cleaned !== e.target.value) e.target.value = cleaned;
+      });
+    });
+    // Recipient/payer: max 3 lines
+    ["n", "p"].forEach((name) => {
+      form.elements[name].addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.target.value.split("\n").length >= 3) e.preventDefault();
+      });
+    });
+
+    /* ---------- Theme ---------- */
+
+    const root = document.documentElement;
+    const savedTheme = storage.get("ips-qr-code:theme");
+    if (savedTheme) root.dataset.theme = savedTheme;
+    $("#theme-toggle").addEventListener("click", () => {
+      const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      root.dataset.theme = dark ? "light" : "dark";
+      storage.set("ips-qr-code:theme", root.dataset.theme);
+      drawBackdrop();
+    });
+
+    /* ---------- Header backdrop ---------- */
+
+    const backdrop = $("#backdrop");
+    function drawBackdrop() {
+      const px = 18;
+      const w = Math.ceil(backdrop.clientWidth / px), h = Math.ceil(backdrop.clientHeight / px);
+      if (!w || !h) return;
+      backdrop.width = w; backdrop.height = h;
+      const ctx = backdrop.getContext("2d");
+      const cs = getComputedStyle(root);
+      const a = cs.getPropertyValue("--pixel-a").trim(), b = cs.getPropertyValue("--pixel-b").trim();
+      let seed = 42;
+      const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+      for (let x = 0; x < w; x++) for (let y = 0; y < h; y++) {
+        ctx.fillStyle = rand() > 0.5 ? a : b;
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
+    let resizeTimer;
+    window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(drawBackdrop, 150); });
+    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawBackdrop);
+
+    /* ---------- Init ---------- */
+
+    const saved = storage.get(STORAGE_KEY) || {};
+    const fromHash = stateFromHash();
+    writeForm(fromHash || saved.form || { k: "PR", sf: "221" });
+    writeLook(saved.look);
+    if (fromHash) {
+      history.replaceState(null, "", location.pathname);
+      FIELDS.forEach((k) => fromHash[k] && touched.add(k));
+    } else if (saved.form) {
+      FIELDS.forEach((k) => saved.form[k] && touched.add(k));
+    }
+    updateLookUi();
+    drawBackdrop();
+    update();
+  })();
+  </script>
+</body>
+</html>
